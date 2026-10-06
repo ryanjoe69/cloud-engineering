@@ -6,7 +6,7 @@ networks: separating what's exposed to the internet from what isn't,
 enforced through routing rather than naming or convention.
 
 ## Architecture diagram
-*(to be added)*
+![VPC Architecture Diagram](VPC1_Architecture.png)
 
 ## Resources created
 | Resource | ID | Purpose |
