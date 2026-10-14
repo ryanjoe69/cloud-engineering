@@ -16,9 +16,6 @@ enforced through routing rather than naming or convention.
 | Private subnet | subnet-080e167d1f4b70b1b | 10.0.2.0/24, us-east-1b |
 | Internet Gateway | igw-018a7a096b252a841 | Internet access for public subnet |
 | Public route table | rtb-0fcfcc81e8954c495 | Routes 0.0.0.0/0 → IGW, associated with public subnet |
-| NAT Gateway | *(in progress)* | Outbound internet for private subnet |
-| IAM role (SSM) | *(in progress)* | Lets SSM manage the instance, no SSH needed |
-| EC2 instance | *(in progress)* | Launched in private subnet, managed via SSM |
 | Private route table | rtb-091298343a37520ed | Routes 0.0.0.0/0 → NAT Gateway, associated with private subnet |
 | NAT Gateway | nat-0cd07bd815f86fbda | Outbound-only internet for private subnet — created, tested, deleted same session |
 | Elastic IP | eipalloc-077e3f5060cf8ec9a | Attached to NAT Gateway — released after teardown |
