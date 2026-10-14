@@ -78,7 +78,7 @@ Relaunched with this AMI. SSM Agent registered successfully within minutes.
 public IP and no inbound rules, yet a shell session opened, authenticated 
 through IAM alone:
 
-![SSM session connecting to the private instance](verif1.png)
+![SSM session connecting to the private instance](Verif1.png)
 
 **2. Outbound connectivity through the NAT Gateway.** From inside that 
 session, `curl -I https://aws.amazon.com` returned `HTTP/2 200`, confirming 
