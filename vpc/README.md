@@ -1,4 +1,4 @@
-VPC with Public/Private Subnet Isolation
+# VPC with Public/Private Subnet Isolation
 
 ## What this is
 A VPC built to understand the core pattern behind most production cloud 
@@ -32,6 +32,7 @@ enforced through routing rather than naming or convention.
 - Created a dedicated route table for the private subnet rather than 
   relying on the VPC's default, making the isolation an explicit design 
   choice rather than an accidental side effect.
+  
 ## Design evolution
 Originally planned with a bastion host in the public subnet, SSH access 
 restricted to a single IP via security group. This proved impractical 
@@ -69,6 +70,53 @@ ami-0db58a8e82c5175f8
 
 Relaunched with this AMI. SSM Agent registered successfully within minutes.
 
+## How to reproduce it
+Each command returns an ID (VPC, subnet, etc.). Substitute it for the 
+matching `<placeholder>` in later commands.
+
+First, save this as `trust-policy.json` in your working directory (a copy 
+is also included in this folder). The IAM role step needs it:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
+Run in this order, substituting the IDs each command returns:
+
+```
+aws ec2 create-vpc --cidr-block 10.0.0.0/16
+aws ec2 create-subnet --vpc-id <vpc-id> --cidr-block 10.0.1.0/24 --availability-zone us-east-1a
+aws ec2 create-subnet --vpc-id <vpc-id> --cidr-block 10.0.2.0/24 --availability-zone us-east-1b
+aws ec2 create-internet-gateway
+aws ec2 attach-internet-gateway --vpc-id <vpc-id> --internet-gateway-id <igw-id>
+aws ec2 create-route-table --vpc-id <vpc-id>
+aws ec2 create-route --route-table-id <public-rt-id> --destination-cidr-block 0.0.0.0/0 --gateway-id <igw-id>
+aws ec2 associate-route-table --subnet-id <public-subnet-id> --route-table-id <public-rt-id>
+aws iam create-role --role-name ssm-ec2-role --assume-role-policy-document file://trust-policy.json
+aws iam attach-role-policy --role-name ssm-ec2-role --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+aws iam create-instance-profile --instance-profile-name ssm-ec2-profile
+aws iam add-role-to-instance-profile --instance-profile-name ssm-ec2-profile --role-name ssm-ec2-role
+aws ec2 allocate-address --domain vpc
+aws ec2 create-nat-gateway --subnet-id <public-subnet-id> --allocation-id <allocation-id>
+aws ec2 create-route-table --vpc-id <vpc-id>
+aws ec2 associate-route-table --subnet-id <private-subnet-id> --route-table-id <private-rt-id>
+aws ec2 create-route --route-table-id <private-rt-id> --destination-cidr-block 0.0.0.0/0 --nat-gateway-id <nat-gateway-id>
+aws ec2 create-security-group --group-name ssm-instance-sg --description "No inbound rules - SSM only" --vpc-id <vpc-id>
+aws ssm get-parameter --name "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64" --query "Parameter.Value" --output text
+aws ec2 run-instances --image-id <ami-id> --instance-type t2.micro --security-group-ids <sg-id> --subnet-id <private-subnet-id> --iam-instance-profile Name=ssm-ec2-profile
+aws ssm start-session --target <instance-id>
+```
+
 ## Verification
 
 **1. SSM session connected to the private instance.** The instance has no 
@@ -83,3 +131,18 @@ the NAT Gateway and private route table work independently of SSM's own
 connection:
 
 ![curl returning HTTP 200 from inside the private instance](verif2.png)
+
+## Teardown
+The billable resources were removed immediately after verification, since a 
+NAT Gateway costs about $0.045/hr with no free tier:
+
+```
+aws ec2 terminate-instances --instance-ids i-0c30e77e9e01f5ac1
+aws ec2 delete-nat-gateway --nat-gateway-id nat-0cd07bd815f86fbda
+aws ec2 release-address --allocation-id eipalloc-077e3f5060cf8ec9a
+```
+
+The Elastic IP is released only after the NAT Gateway reaches `deleted`, 
+because it keeps billing if left unattached. The VPC, subnets, route tables, 
+internet gateway, security group, and IAM role cost nothing and were left 
+in place.
