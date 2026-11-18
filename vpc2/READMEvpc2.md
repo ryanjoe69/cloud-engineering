@@ -579,8 +579,6 @@ aws ec2 describe-instances --filters Name=vpc-id,Values=vpc-0a873231b1dda8bdd Na
 aws ec2 describe-addresses
 ```
 
-![Teardown verification](teardown-clean.png)
-
 After the NAT Gateway was deleted, the `0.0.0.0/0` route in `app-rt` shows as `blackhole`, which is harmless. The VPC, subnets, route tables, security groups, IAM resources, S3 bucket, and CloudFront distribution cost nothing and were left in place.
 
 ---
