@@ -498,9 +498,9 @@ python3 -m http.server 3306 > /dev/null 2>&1 &
 |---|---|---|---|---|---|
 | 1 | Web to App :8080 | `curl -I -m 5 http://10.1.2.42:8080` | Allowed | 200 OK | ![Test 1](web-can-reach-app.png) |
 | 2 | App to Data :3306 | `curl -I -m 5 http://10.1.3.214:3306` | Allowed | 200 OK | ![Test 2](App-can-reach-data.png) |
-| 3 | Web to Data :3306 | `curl -I -m 5 http://10.1.3.214:3306` | **Blocked** | Timed out | ![Test 3](test3-web-to-data-blocked.png) |
-| 4 | App to internet | `curl -I -m 5 https://aws.amazon.com` | Allowed (via NAT) | 200 | ![Test 4](test4-app-outbound.png) |
-| 5 | Data to internet | `curl -I -m 5 https://aws.amazon.com` | **Blocked** (no route) | Timed out | ![Test 5](test5-data-no-internet.png) |
+| 3 | Web to Data :3306 | `curl -I -m 5 http://10.1.3.214:3306` | **Blocked** | Timed out | ![Test 3](web-cannot-reach-data.png) |
+| 4 | App to internet | `curl -I -m 5 https://aws.amazon.com` | Allowed (via NAT) | 200 | ![Test 4](app-has-access-via-nat.png) |
+| 5 | Data to internet | `curl -I -m 5 https://aws.amazon.com` | **Blocked** (no route) | Timed out | ![Test 5](Data-no-internet-route.png) |
 
 Test 2 doubles as a control. The data server was up and reachable from the app tier, so the timeout in Test 3 can only come from the security group. A blocked connection looks like a timeout, not "connection refused," because security groups drop disallowed traffic silently.
 
