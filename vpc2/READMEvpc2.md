@@ -515,7 +515,7 @@ aws s3 ls s3://three-tier-site-rj11-4813/ --region us-east-1
 
 The first printed the page (`GetObject` is allowed). The second returned `AccessDenied`, because `ListBucket` was never granted.
 
-![GetObject allowed](Optional-test-1.png)
+![GetObject allowed](optional-test-1.png)
 ![List denied](optional-test-2.png)
 
 ### Static site
