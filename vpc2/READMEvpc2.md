@@ -526,13 +526,10 @@ The first printed the page (`GetObject` is allowed). The second returned `Access
 
 ### Supporting evidence
 
-All three instances registered with SSM, including the data tier that has no internet route. That confirms the VPC endpoints work.
+All three instances registered with SSM.
 
-![Instances online in SSM](instances-ssm-online.png)
-![VPC endpoints available](vpc-endpoints.png)
-![App route table with the NAT route](app-rt-nat-route.png)
-![Route tables](route-tables.png)
-![Security-group chaining](sg-chaining.png)
+![Instances online in SSM](instance-ssm.png)
+
 
 ---
 
