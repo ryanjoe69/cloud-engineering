@@ -326,7 +326,6 @@ See [Verification](#7-verification).
 
 ### Phase 8: Teardown
 
-See [Teardown](#10-teardown).
 
 ---
 
