@@ -496,7 +496,7 @@ python3 -m http.server 3306 > /dev/null 2>&1 &
 
 | # | From to | Command | Expected | Result | Evidence |
 |---|---|---|---|---|---|
-| 1 | Web to App :8080 | `curl -I -m 5 http://10.1.2.42:8080` | Allowed | 200 OK | ![Test 1](test1-web-to-app.png) |
+| 1 | Web to App :8080 | `curl -I -m 5 http://10.1.2.42:8080` | Allowed | 200 OK | ![Test 1](web-can-reach-app.png) |
 | 2 | App to Data :3306 | `curl -I -m 5 http://10.1.3.214:3306` | Allowed | 200 OK | ![Test 2](test2-app-to-data.png) |
 | 3 | Web to Data :3306 | `curl -I -m 5 http://10.1.3.214:3306` | **Blocked** | Timed out | ![Test 3](test3-web-to-data-blocked.png) |
 | 4 | App to internet | `curl -I -m 5 https://aws.amazon.com` | Allowed (via NAT) | 200 | ![Test 4](test4-app-outbound.png) |
